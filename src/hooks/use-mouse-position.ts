@@ -9,8 +9,7 @@ export const useMousePosition = () => {
     setIsMoving(true)
     
     // Clear moving state after a delay
-    const timer = setTimeout(() => setIsMoving(false), 100)
-    return () => clearTimeout(timer)
+    setTimeout(() => setIsMoving(false), 100)
   }, [])
 
   useEffect(() => {

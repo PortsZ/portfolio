@@ -4,7 +4,8 @@ import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useTypingEffect } from '@/hooks/use-typing-effect'
-import { useMousePosition } from '@/hooks/use-mouse-position'
+import { useRef } from 'react'
+import useMouse from '@react-hook/mouse-position'
 
 const words = [
   'Full Stack Developer',
@@ -15,7 +16,12 @@ const words = [
 
 export function HeroSection() {
   const { currentText, isTyping } = useTypingEffect(words, 100, 50, 2000)
-  const { x, y, isMoving } = useMousePosition()
+  const sectionRef = useRef<HTMLElement>(null)
+  const mouse = useMouse(sectionRef as React.RefObject<HTMLElement>, {
+    fps: 60,
+    enterDelay: 0,
+    leaveDelay: 0
+  })
 
   const floatingElements = [
     { icon: '⚡', delay: 0, x: 20, y: -20 },
@@ -25,7 +31,7 @@ export function HeroSection() {
   ]
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-20 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />
@@ -51,15 +57,17 @@ export function HeroSection() {
       ))}
 
       {/* Mouse Follower */}
-      <motion.div
-        className="fixed w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full pointer-events-none z-50 mix-blend-difference"
-        animate={{
-          x: x - 2,
-          y: y - 2,
-          scale: isMoving ? 1.5 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 500, damping: 28 }}
-      />
+      {mouse.isOver && (
+        <motion.div
+          className="fixed w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full pointer-events-none z-50 mix-blend-difference"
+          animate={{
+            x: (mouse.clientX || 0) - 900,
+            y: (mouse.clientY || 0) - 530,
+            scale: mouse.isDown ? 1.5 : 1,
+          }}
+          transition={{ type: "spring", stiffness: 500, damping: 28 }}
+        />
+      )}
 
       {/* Main Content */}
       <div className="text-center z-10 px-4 sm:px-6 lg:px-8">
